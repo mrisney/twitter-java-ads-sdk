@@ -1,0 +1,93 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'jacoco'
+
+repositories {
+    mavenCentral()
+}
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.6.0'
+    }
+}
+
+configurations {
+    provided
+}
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+eclipse {
+	classpath {
+		 containers.remove('org.eclipse.jdt.launching.JRE_CONTAINER')
+		 containers 'org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8'
+	}
+}
+
+
+
+dependencies {
+
+  provided 'org.projectlombok:lombok:1.16.6'
+  compile 'org.projectlombok:lombok:1.16.6'
+  compile 'com.google.guava:guava:19.0'
+  compile 'com.google.code.gson:gson:2.6.1'
+  compile 'com.sun.jersey:jersey-client:1.19'
+  compile 'com.sun.jersey.contribs:jersey-multipart:1.19'
+  compile 'com.sun.jersey:jersey-json:1.19'
+  compile 'com.sun.jersey.contribs.jersey-oauth:oauth-client:1.19'
+  compile 'com.sun.jersey.contribs.jersey-oauth:oauth-signature:1.19'
+  compile 'org.apache.commons:commons-lang3:3.0'
+  compile 'commons-beanutils:commons-beanutils:1.8.3'
+  compile 'org.slf4j:slf4j-api:1.7.14'
+  compile 'org.slf4j:slf4j-log4j12:1.7.14'
+  compile 'org.hamcrest:hamcrest-junit:2.0.0.0'
+  testCompile 'junit:junit-dep:4.10'
+  testCompile 'com.jayway.awaitility:awaitility:1.7.0'
+  testCompile 'org.mockito:mockito-core:1.+'
+}
+
+/*
+task javadocs(type: Javadoc) {
+   source = sourceSets.main.allJava
+   destinationDir = file("./javadoc/")
+ }
+*/
+/*
+task delombok {
+    description 'Delomboks the source code'
+    ant.taskdef(classname: 'lombok.delombok.ant.Tasks$Delombok', classpath: configurations.compile.asPath,  name: 'delombok')
+    ant.mkdir(dir: 'build/src-delomboked')
+    ant.delombok(verbose: 'true', encoding: 'UTF-8', to: 'build/src-delomboked', from: 'src/main/java')
+}
+*/
+
+
+jacocoTestReport {
+  group = "Reporting"
+  apply plugin: 'com.github.kt3k.coveralls'
+	reports {
+		xml.enabled true
+    html.enabled true
+		csv.enabled true
+		html.destination "${buildDir}/reports/coverage"
+	}
+
+  afterEvaluate {
+          classDirectories = files(classDirectories.files.collect {
+              fileTree(dir: it, exclude: ['com/steelhouse/twitter/ads/enums/**',
+                                          'com/steelhouse/twitter/ads/audience/**',
+                                          'com/steelhouse/twitter/ads/common/Constants'
+              ])
+          })
+      }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.3'
+}

@@ -1,0 +1,5 @@
+package com.steelhouse.twitter.ads.enums;
+
+public enum Objective {
+	APP_ENGAGEMENTS, APP_INSTALLS, FOLLOWERS, LEAD_GENERATION, TWEET_ENGAGEMENTS, VIDEO_VIEWS, WEBSITE_CLICKS, CUSTOM
+}
